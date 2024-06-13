@@ -1,0 +1,68 @@
+import pygame
+import random
+import sys
+
+# Initialize Pygame
+pygame.init()
+
+# Set up the display
+WIDTH, HEIGHT = 800, 600
+DISPLAY = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Avoid the Red Balls")
+
+# Define colors
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+RED = (255, 0, 0)
+BLUE = (0, 0, 255)
+
+# Define constants
+PLAYER_RADIUS = 20
+ENEMY_RADIUS = 15
+PLAYER_SPEED = 5
+ENEMY_SPEED = 3
+
+# Define game objects
+player = pygame.Rect(WIDTH//2 - PLAYER_RADIUS, HEIGHT - 2 * PLAYER_RADIUS, 2 * PLAYER_RADIUS, 2 * PLAYER_RADIUS)
+enemy1 = pygame.Rect(random.randint(ENEMY_RADIUS, WIDTH - ENEMY_RADIUS), random.randint(ENEMY_RADIUS, HEIGHT - ENEMY_RADIUS), 2 * ENEMY_RADIUS, 2 * ENEMY_RADIUS)
+enemy2 = pygame.Rect(random.randint(ENEMY_RADIUS, WIDTH - ENEMY_RADIUS), random.randint(ENEMY_RADIUS, HEIGHT - ENEMY_RADIUS), 2 * ENEMY_RADIUS, 2 * ENEMY_RADIUS)
+
+# Main game loop
+clock = pygame.time.Clock()
+while True:
+    DISPLAY.fill(BLACK)
+
+    # Handle events
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+
+    # Move the player
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_LEFT] and player.left > 0:
+        player.move_ip(-PLAYER_SPEED, 0)
+    if keys[pygame.K_RIGHT] and player.right < WIDTH:
+        player.move_ip(PLAYER_SPEED, 0)
+    if keys[pygame.K_UP] and player.top > 0:
+        player.move_ip(0, -PLAYER_SPEED)
+    if keys[pygame.K_DOWN] and player.bottom < HEIGHT:
+        player.move_ip(0, PLAYER_SPEED)
+
+    # Move the enemies
+    enemy1.move_ip(random.randint(-ENEMY_SPEED, ENEMY_SPEED), random.randint(-ENEMY_SPEED, ENEMY_SPEED))
+    enemy2.move_ip(random.randint(-ENEMY_SPEED, ENEMY_SPEED), random.randint(-ENEMY_SPEED, ENEMY_SPEED))
+
+    # Draw the player and enemies
+    pygame.draw.circle(DISPLAY, BLUE, player.center, PLAYER_RADIUS, 2)
+    pygame.draw.circle(DISPLAY, RED, enemy1.center, ENEMY_RADIUS)
+    pygame.draw.circle(DISPLAY, RED, enemy2.center, ENEMY_RADIUS)
+
+    # Check for collision
+    if player.colliderect(enemy1) or player.colliderect(enemy2):
+        print("Game Over!")
+        pygame.quit()
+        sys.exit()
+
+    pygame.display.update()
+    clock.tick(60)
